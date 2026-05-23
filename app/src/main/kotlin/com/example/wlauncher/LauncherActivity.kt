@@ -85,13 +85,14 @@ import com.flue.launcher.ui.theme.WatchLauncherTheme
 import com.flue.launcher.util.applyFadeCloseTransition
 import com.flue.launcher.util.applyFadeOpenTransition
 import com.flue.launcher.util.RecentsVisibility
-import com.flue.launcher.viewmodel.HoneycombFastScrollOptimizationMode
 import com.flue.launcher.viewmodel.LauncherViewModel
 import com.flue.launcher.watchface.BUILT_IN_WATCHFACE_ID
 import com.flue.launcher.watchface.BuiltInWatchFaceOptions
 import com.flue.launcher.watchface.LunchWatchFaceHost
 import com.flue.launcher.watchface.jbwatch.JbWatchFaceHost
 import androidx.compose.animation.core.Spring
+import androidx.compose.ui.graphics.ImageBitmap
+import com.flue.launcher.ui.drawer.NineGridDrawerScreen
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -529,7 +530,7 @@ fun LauncherScreen(vm: LauncherViewModel) {
         appListShadowsReady = true
     }
     val launcherScope = rememberCoroutineScope()
-    var retainedLaunchIcon by remember { mutableStateOf<androidx.compose.ui.graphics.ImageBitmap?>(null) }
+    var retainedLaunchIcon by remember { mutableStateOf<ImageBitmap?>(null) }
     var retainedLaunchSplash by remember { mutableStateOf(false) }
     val notificationTransition = remember { Animatable(if (notificationSceneActive) 1f else 0f) }
     var notificationGestureActive by remember { mutableStateOf(false) }
@@ -985,6 +986,18 @@ fun LauncherScreen(vm: LauncherViewModel) {
                         onDissolveFolder = vm::dissolveFolder,
                         onScrollToTop = { vm.setState(ScreenState.Face) }
                     )
+                    LayoutMode.NineGrid -> NineGridDrawerScreen(
+                        apps = apps,
+                        appListScalePercent = appListScalePercent,
+                        twoToneIconsEnabled = twoToneIconsEnabled,
+                        active = screenState == ScreenState.Apps,
+                        initialScrollResetKey = directLaunchInitialScrollResetKey,
+                        onScrollToTop = { vm.setState(ScreenState.Face) },            // 下滑返回表盘
+                        onAppClick = { app, origin ->
+                            launchAppFromLauncher(app, origin, ScreenState.Apps)
+                        }
+                    )
+
                 }
             }
 
@@ -1206,9 +1219,16 @@ fun LauncherScreen(vm: LauncherViewModel) {
 }
 
 @Composable
+fun NineGridDrawerScreen(
+
+) {
+    TODO("Not yet implemented")
+}
+
+@Composable
 private fun LaunchBackdropContent(
     showSplash: Boolean,
-    icon: androidx.compose.ui.graphics.ImageBitmap?,
+    icon: ImageBitmap?,
     uiStyle: UiStyle,
     backgroundColor: Color
 ) {
