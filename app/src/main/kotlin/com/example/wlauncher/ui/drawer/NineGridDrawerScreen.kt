@@ -161,12 +161,35 @@ fun NineGridDrawerScreen(
                 }
             )
             .pointerInput(onScrollToTop) {
+                val swipeThreshold = with(density) {
+                    configuration.screenWidthDp.dp.toPx() * 0.30f
+                }
                 awaitEachGesture {
-                    awaitPrimaryDown()
+                    val down = awaitPrimaryDown()
+                    val startX = down.position.x
+                    var pointerUpEvent: androidx.compose.ui.input.pointer.PointerInputChange? = null
+
                     do {
                         val event = awaitPointerEvent()
-                    } while (event.changes.any { it.pressed })
+                        if (event.changes.none { it.pressed }) {
+                            pointerUpEvent = event.changes.firstOrNull()
+                        }
+                    } while (pointerUpEvent == null)
 
+                    // 右滑返回表盘
+                    val releasePos = pointerUpEvent.position
+                    if (releasePos.x - startX > swipeThreshold) {
+                        if (!returnTriggered) {
+                            returnTriggered = true
+                            onScrollToTop()
+                        }
+                        scope.launch {
+                            overscroll.stop()
+                            overscroll.snapTo(0f)
+                        }
+                        returnTriggered = false
+                    }
+                    // 下拉回弹到表盘
                     if (overscroll.value >= topReturnThresholdPx) {
                         if (!returnTriggered) {
                             returnTriggered = true

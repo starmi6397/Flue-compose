@@ -353,13 +353,40 @@ fun ListDrawerScreen(
                     }
                 )
                 .pointerInput(onScrollToTop, dragFromIndex, longPressedApp) {
+                    val swipeThreshold = with(density) {
+                        configuration.screenWidthDp.dp.toPx() * 0.30f
+                    }
                     awaitEachGesture {
-                        awaitPrimaryDown()
+                        val down = awaitPrimaryDown()
+                        val startX = down.position.x
+                        var pointerUpEvent: androidx.compose.ui.input.pointer.PointerInputChange? = null
+
                         while (true) {
                             val event = awaitPointerEvent()
-                            if (event.changes.none { it.pressed }) break
+                            if (event.changes.none { it.pressed }) {
+                                pointerUpEvent = event.changes.firstOrNull()
+                                break
+                            }
                         }
-                        if (dragFromIndex == null && longPressedApp == null && overscroll.value != 0f) {
+
+                        val tappedOnNothing = dragFromIndex == null && longPressedApp == null
+                        if (!tappedOnNothing) return@awaitEachGesture
+
+                        // 右滑返回表盘
+                        val releasePos = pointerUpEvent?.position
+                        if (releasePos != null && releasePos.x - startX > swipeThreshold) {
+                            if (!returnTriggered) {
+                                returnTriggered = true
+                                onScrollToTop()
+                            }
+                            scope.launch {
+                                overscroll.stop()
+                                overscroll.snapTo(0f)
+                            }
+                            returnTriggered = false
+                        }
+                        // 下拉回弹到表盘
+                        if (overscroll.value != 0f) {
                             val shouldReturnToFace = overscroll.value >= topReturnThresholdPx
                             scope.launch {
                                 if (shouldReturnToFace) {
