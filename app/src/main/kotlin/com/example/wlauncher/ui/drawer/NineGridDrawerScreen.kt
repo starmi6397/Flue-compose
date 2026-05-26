@@ -15,7 +15,9 @@ import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyGridState
@@ -200,7 +202,8 @@ fun NineGridDrawerScreen(
 
             Box(
                 modifier = Modifier
-                    .size(scaledIconSize)
+                    .fillMaxWidth()
+                    .aspectRatio(1f)
                     .combinedClickable(
                         interactionSource = interactionSource,
                         indication = null,
