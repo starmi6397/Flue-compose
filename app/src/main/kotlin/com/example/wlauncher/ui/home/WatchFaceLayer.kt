@@ -337,7 +337,7 @@ private fun BuiltInWatchFaceSurface(
         BUILT_IN_VIDEO_WATCHFACE_ID -> videoOptions
         else -> photoOptions.copy(
             clockPosition = WatchClockPosition.CENTER,
-            clockSizeSp = 64,
+            clockSizeSp = 56,
             boldClock = false,
             clockColorMode = WatchClockColorMode.AUTO
         )
