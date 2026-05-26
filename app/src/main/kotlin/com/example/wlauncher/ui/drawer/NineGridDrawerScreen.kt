@@ -6,6 +6,7 @@ import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.awaitEachGesture
@@ -41,6 +42,7 @@ import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.Velocity
@@ -52,13 +54,19 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @SuppressLint("ConfigurationScreenWidthHeight")
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun NineGridDrawerScreen(
     apps: List<AppInfo>,
     iconSize: Dp = 97.dp,
     appListScalePercent: Int = 100,
+    blurEnabled: Boolean = true,
     twoToneIconsEnabled: Boolean = false,
     onAppClick: (AppInfo, Offset) -> Unit,
+    onExcludeApp: (AppInfo) -> Unit = {},
+    onRemoveShortcut: (AppInfo) -> Unit = {},
+    onRenameFolder: (AppInfo, String) -> Unit = { _, _ -> },
+    onDissolveFolder: (AppInfo) -> Unit = {},
     onScrollToTop: () -> Unit = {},
     active: Boolean = true,
     initialScrollResetKey: Int = 0
@@ -67,6 +75,8 @@ fun NineGridDrawerScreen(
     val density = LocalDensity.current
     val configuration = LocalConfiguration.current
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+    var longPressedApp by remember { mutableStateOf<AppInfo?>(null) }
 
     val overscroll = remember { Animatable(0f) }
     val overscrollLimitPx = with(density) { configuration.screenHeightDp.dp.toPx() / 2f }
@@ -194,7 +204,11 @@ fun NineGridDrawerScreen(
                     .combinedClickable(
                         interactionSource = interactionSource,
                         indication = null,
-                        onClick = { onAppClick(app, Offset(0.5f, 0.5f)) }
+                        onClick = { onAppClick(app, Offset(0.5f, 0.5f)) },
+                        onLongClick = {
+                            longPressedApp = app
+                            vibrateHaptic(context)
+                        }
                     )
                     .graphicsLayer {
                         scaleX = pressedScale
@@ -214,6 +228,18 @@ fun NineGridDrawerScreen(
                 )
             }
         }
+    }
+
+    longPressedApp?.let { app ->
+        AppShortcutOverlay(
+            app = app,
+            blurEnabled = blurEnabled,
+            onExcludeApp = { onExcludeApp(app) },
+            onRemoveShortcut = if (app.isAppListShortcut) { { onRemoveShortcut(app) } } else null,
+            onRenameFolder = if (app.isFolder) { name -> onRenameFolder(app, name) } else null,
+            onDissolveFolder = if (app.isFolder) { { onDissolveFolder(app) } } else null,
+            onDismiss = { longPressedApp = null }
+        )
     }
 }
 

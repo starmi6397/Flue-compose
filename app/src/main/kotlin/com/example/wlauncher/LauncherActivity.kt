@@ -989,13 +989,18 @@ fun LauncherScreen(vm: LauncherViewModel) {
                     LayoutMode.NineGrid -> NineGridDrawerScreen(
                         apps = apps,
                         appListScalePercent = appListScalePercent,
+                        blurEnabled = blurEnabled,
                         twoToneIconsEnabled = twoToneIconsEnabled,
                         active = screenState == ScreenState.Apps,
                         initialScrollResetKey = directLaunchInitialScrollResetKey,
-                        onScrollToTop = { vm.setState(ScreenState.Face) },            // 下滑返回表盘
                         onAppClick = { app, origin ->
                             launchAppFromLauncher(app, origin, ScreenState.Apps)
-                        }
+                        },
+                        onExcludeApp = { appInfo -> vm.setAppHidden(appInfo.componentKey, true) },
+                        onRemoveShortcut = vm::removeAppListShortcut,
+                        onRenameFolder = vm::renameFolder,
+                        onDissolveFolder = vm::dissolveFolder,
+                        onScrollToTop = { vm.setState(ScreenState.Face) }            // 下滑返回表盘
                     )
 
                 }
