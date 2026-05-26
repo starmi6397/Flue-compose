@@ -13,10 +13,8 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyGridState
@@ -31,7 +29,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
@@ -58,7 +55,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun NineGridDrawerScreen(
     apps: List<AppInfo>,
-    iconSize: Dp = 48.dp,
+    iconSize: Dp = 97.dp,
     appListScalePercent: Int = 100,
     twoToneIconsEnabled: Boolean = false,
     onAppClick: (AppInfo, Offset) -> Unit,
@@ -174,9 +171,9 @@ fun NineGridDrawerScreen(
             .graphicsLayer {
                 translationY = overscroll.value
             },
-        contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        horizontalArrangement = Arrangement.spacedBy(16.dp)
+        contentPadding = PaddingValues(4.dp),
+        verticalArrangement = Arrangement.spacedBy(2.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         itemsIndexed(
             items = apps,
@@ -191,36 +188,30 @@ fun NineGridDrawerScreen(
                 label = "press"
             )
 
-            Column(
+            Box(
                 modifier = Modifier
+                    .size(scaledIconSize)
                     .combinedClickable(
                         interactionSource = interactionSource,
                         indication = null,
                         onClick = { onAppClick(app, Offset(0.5f, 0.5f)) }
                     )
-                    .padding(4.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(scaledIconSize)
-                        .graphicsLayer {
-                            scaleX = pressedScale
-                            scaleY = pressedScale
-                        }
-                        .clip(CircleShape)
-                ) {
-                    Image(
-                        bitmap = app.iconForDisplay(
-                            useTwoTone = twoToneIconsEnabled,
-                            blurred = false
-                        ),
-                        contentDescription = app.label,
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Fit
-                    )
-                }
-
+                    .graphicsLayer {
+                        scaleX = pressedScale
+                        scaleY = pressedScale
+                    }
+                    .clip(CircleShape)
+            )
+            {
+                Image(
+                    bitmap = app.iconForDisplay(
+                        useTwoTone = twoToneIconsEnabled,
+                        blurred = false
+                    ),
+                    contentDescription = app.label,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Fit
+                )
             }
         }
     }
