@@ -110,6 +110,8 @@ class LauncherActivity : ComponentActivity() {
 
     private lateinit var vm: LauncherViewModel
     private var deferredResumeMaintenance: Runnable? = null
+    private var resumeBeforeNewIntent = false
+    private var resumeFlagReset: Runnable? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -138,7 +140,16 @@ class LauncherActivity : ComponentActivity() {
         super.onNewIntent(intent)
         setIntent(intent)
         if (::vm.isInitialized && intent.isLauncherHomeIntent()) {
-            vm.requestHomePress()
+            // 区分系统亮屏 HOME intent 与物理按 Home 键：
+            // 亮屏唤醒时 onResume 先于 onNewIntent 调用（进程解冻）
+            // 前台直接按 Home 键则仅调用 onNewIntent
+            resumeFlagReset?.let { window.decorView.removeCallbacks(it) }
+            val hadResumeFlag = resumeBeforeNewIntent
+            resumeBeforeNewIntent = false
+            val isWakeFromSleep = hadResumeFlag && vm.screenState.value == ScreenState.Face
+            if (!isWakeFromSleep) {
+                vm.requestHomePress()
+            }
         }
     }
 
@@ -153,6 +164,12 @@ class LauncherActivity : ComponentActivity() {
             vm.onReturnToLauncher()
             scheduleDeferredResumeMaintenance()
         }
+        // 进程解冻/恢复后会经过 onResume，随后 HOME intent 到来
+        // 如果短时间无 HOME intent 到来，则回收标记，避免误判
+        resumeBeforeNewIntent = true
+        resumeFlagReset?.let { window.decorView.removeCallbacks(it) }
+        resumeFlagReset = Runnable { resumeBeforeNewIntent = false }
+        window.decorView.postDelayed(resumeFlagReset!!, 500)
     }
 
     override fun onPause() {
