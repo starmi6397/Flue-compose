@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import androidx.datastore.preferences.core.edit
 import kotlin.math.roundToInt
 
 class PreferencesViewModel(application: Application) : AndroidViewModel(application) {
@@ -635,7 +636,7 @@ class PreferencesViewModel(application: Application) : AndroidViewModel(applicat
         refreshIconsJob?.cancel()
         refreshIconsJob = viewModelScope.launch {
             delay(200)
-            appRepository.refreshIcons()
+            appRepository.requestRefresh(if (_lowResIcons.value) 64 else 128)
         }
     }
 

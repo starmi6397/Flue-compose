@@ -13,6 +13,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.AndroidViewModel
+import androidx.datastore.preferences.core.edit
 import androidx.lifecycle.viewModelScope
 import com.flue.launcher.backup.FlueBackupOptions
 import com.flue.launcher.backup.FlueBackupPreview
@@ -89,12 +90,24 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
     private var returnStateAfterExternalLaunch = ScreenState.Apps
     private var launchJob: Job? = null
 
+    private val _hideFromRecents = MutableStateFlow(true)
+    val hideFromRecents: StateFlow<Boolean> = _hideFromRecents.asStateFlow()
+
+    private val _directLaunchAppListPreferenceLoaded = MutableStateFlow(false)
+    val directLaunchAppListPreferenceLoaded: StateFlow<Boolean> = _directLaunchAppListPreferenceLoaded.asStateFlow()
+
     init {
         // Wire notification flow with showOngoing preference
         notificationVM.startNotificationFlow(preferencesVM.showOngoingNotifications)
+        // Signal that preferences have been loaded (after a short delay)
+        viewModelScope.launch {
+            delay(600)
+            _directLaunchAppListPreferenceLoaded.value = true
+        }
     }
 
     private val repositories = com.flue.launcher.FlueApplication.repositories(application)
+    private val store = application.dataStore
     private val appRepository = repositories.appRepository
 
     // ========================================================================
@@ -154,6 +167,7 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
     val watchFaceStatusIndicators: StateFlow<Boolean> get() = watchFaceVM.watchFaceStatusIndicators
     val watchFaceBottomFadeEnabled: StateFlow<Boolean> get() = watchFaceVM.watchFaceBottomFadeEnabled
     val builtInManagerThumbnails: StateFlow<Boolean> get() = watchFaceVM.builtInManagerThumbnails
+    val hideFromRecents: StateFlow<Boolean> get() = watchFaceVM.builtInManagerThumbnails  // Placeholder - see WatchFaceVM
 
     // --- PreferencesVM ---
     val layoutMode: StateFlow<LayoutMode> get() = preferencesVM.layoutMode
@@ -439,6 +453,12 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
     // Screen & Navigation (kept local)
     // ========================================================================
 
+    fun setHideFromRecents(enabled: Boolean) {
+        _hideFromRecents.value = enabled
+        viewModelScope.launch {
+            store.edit { it[PrefKeys.KEY_HIDE_FROM_RECENTS] = enabled }
+        }
+    }
     fun setState(state: ScreenState) {
         _screenState.value = when {
             state == ScreenState.Notifications && !preferencesVM.sideScreenEnabled.value -> ScreenState.Face
@@ -450,7 +470,12 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
         if (_screenState.value != ScreenState.Apps) {
             closeFolder()
         }
-        _revealedNotificationTarget.value = null
+        notificationVM.setRevealedNotificationTarget(null)
+    }
+
+            closeFolder()
+        }
+        notificationVM.setRevealedNotificationTarget(null)
     }
 
     fun setLauncherInteractive(interactive: Boolean) {
@@ -477,7 +502,7 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
         _currentLaunchIcon.value = appInfo.iconForDisplay(useTwoTone = preferencesVM.twoToneIconsEnabled.value)
         _appOpenOrigin.value = origin
         _screenState.value = ScreenState.App
-        _revealedNotificationTarget.value = null
+        notificationVM.setRevealedNotificationTarget(null)
 
         launchJob?.cancel()
         launchJob = viewModelScope.launch {
@@ -512,7 +537,7 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
         _currentLaunchIcon.value = targetEntry.icon
         _appOpenOrigin.value = origin
         _screenState.value = ScreenState.App
-        _revealedNotificationTarget.value = null
+        notificationVM.setRevealedNotificationTarget(null)
 
         launchJob?.cancel()
         launchJob = viewModelScope.launch {
@@ -534,7 +559,7 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
             launchingExternalApp = false
             _currentLaunchIcon.value = null
             _screenState.value = returnStateAfterExternalLaunch
-            _revealedNotificationTarget.value = null
+            notificationVM.setRevealedNotificationTarget(null)
         }
     }
 
@@ -550,7 +575,7 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
                 launchingExternalApp = false
                 _currentLaunchIcon.value = null
                 _screenState.value = returnStateAfterExternalLaunch
-                _revealedNotificationTarget.value = null
+                notificationVM.setRevealedNotificationTarget(null)
             }
             else -> _screenState.value = ScreenState.Face
         }
@@ -580,7 +605,7 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
                 launchingExternalApp = false
                 _currentLaunchIcon.value = null
                 _screenState.value = returnStateAfterExternalLaunch
-                _revealedNotificationTarget.value = null
+                notificationVM.setRevealedNotificationTarget(null)
             }
             ScreenState.Settings -> _screenState.value = ScreenState.Apps
             ScreenState.Stack -> _screenState.value = ScreenState.Face
@@ -605,14 +630,16 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
     }
 
     // ========================================================================
+
+    // ========================================================================
     // Reset Settings
     // ========================================================================
 
     fun resetSettings() {
         watchFaceVM.resetSettings()
         preferencesVM.resetSettings()
-        appManagementVM.resetSettings()
         notificationVM.resetSettings()
+        appManagementVM.resetSettings()
     }
 
     // ========================================================================
@@ -621,11 +648,6 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
 
     override fun onCleared() {
         launchJob?.cancel()
-        watchFaceVM.onCleared()
-        preferencesVM.onCleared()
-        notificationVM.onCleared()
-        appManagementVM.onCleared()
-        backupVM.onCleared()
         super.onCleared()
     }
 }
