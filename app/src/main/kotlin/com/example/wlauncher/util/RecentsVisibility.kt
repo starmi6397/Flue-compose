@@ -3,7 +3,7 @@
 import android.app.Activity
 import android.app.ActivityManager
 import android.content.Context
-import com.flue.launcher.viewmodel.LauncherViewModel
+import com.flue.launcher.viewmodel.PrefKeys
 import com.flue.launcher.viewmodel.dataStore
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -11,7 +11,7 @@ import kotlinx.coroutines.runBlocking
 object RecentsVisibility {
     @JvmStatic
     fun readPreference(context: Context): Boolean = runBlocking {
-        context.applicationContext.dataStore.data.first()[LauncherViewModel.KEY_HIDE_FROM_RECENTS] ?: true
+        context.applicationContext.dataStore.data.first()[PrefKeys.KEY_HIDE_FROM_RECENTS] ?: true
     }
 
     @JvmStatic

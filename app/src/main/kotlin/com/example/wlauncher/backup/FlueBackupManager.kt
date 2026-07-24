@@ -9,7 +9,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.flue.launcher.data.repository.WidgetRepository
-import com.flue.launcher.viewmodel.LauncherViewModel
+import com.flue.launcher.viewmodel.PrefKeys
 import com.flue.launcher.viewmodel.dataStore
 import com.flue.launcher.watchface.WatchFacePhotoCache
 import java.io.File
@@ -64,53 +64,53 @@ object FlueBackupManager {
     private const val VIDEO_MEDIA_ENTRY = "watchfaces/video/media"
     private const val FONT_ENTRY = "watchfaces/font/current"
 
-    private val appOrderKey = LauncherViewModel.KEY_APP_ORDER.name
-    private val sideScreenShortcutsKey = LauncherViewModel.KEY_SIDE_SCREEN_SHORTCUTS.name
-    private val sideScreenWidgetsKey = LauncherViewModel.KEY_SIDE_SCREEN_WIDGETS.name
-    private val hiddenAppsKey = LauncherViewModel.KEY_HIDDEN_APPS.name
-    private val photoPathKey = LauncherViewModel.KEY_BUILTIN_PHOTO_PATH.name
-    private val videoPathKey = LauncherViewModel.KEY_BUILTIN_VIDEO_PATH.name
-    private val fontPathKey = LauncherViewModel.KEY_WATCHFACE_FONT_PATH.name
-    private val lastWatchFaceErrorKey = LauncherViewModel.KEY_LAST_WATCHFACE_ERROR.name
+    private val appOrderKey = PrefKeys.KEY_APP_ORDER.name
+    private val sideScreenShortcutsKey = PrefKeys.KEY_SIDE_SCREEN_SHORTCUTS.name
+    private val sideScreenWidgetsKey = PrefKeys.KEY_SIDE_SCREEN_WIDGETS.name
+    private val hiddenAppsKey = PrefKeys.KEY_HIDDEN_APPS.name
+    private val photoPathKey = PrefKeys.KEY_BUILTIN_PHOTO_PATH.name
+    private val videoPathKey = PrefKeys.KEY_BUILTIN_VIDEO_PATH.name
+    private val fontPathKey = PrefKeys.KEY_WATCHFACE_FONT_PATH.name
+    private val lastWatchFaceErrorKey = PrefKeys.KEY_LAST_WATCHFACE_ERROR.name
 
     private val photoPreferenceNames = setOf(
         photoPathKey,
-        LauncherViewModel.KEY_PHOTO_CLOCK_POSITION.name,
-        LauncherViewModel.KEY_PHOTO_CLOCK_SIZE.name,
-        LauncherViewModel.KEY_PHOTO_CLOCK_BOLD.name,
-        LauncherViewModel.KEY_PHOTO_CLOCK_STYLE.name,
-        LauncherViewModel.KEY_PHOTO_MD3E_SHAPE.name,
-        LauncherViewModel.KEY_PHOTO_USE_THEME_TEXT_COLOR.name,
-        LauncherViewModel.KEY_PHOTO_TEXT_COLOR.name,
-        LauncherViewModel.KEY_PHOTO_MD3E_AUTO_COLORS.name,
-        LauncherViewModel.KEY_PHOTO_MD3E_TEXT_COLOR.name,
-        LauncherViewModel.KEY_PHOTO_MD3E_FACE_COLOR.name,
-        LauncherViewModel.KEY_PHOTO_MD3E_HOUR_COLOR.name,
-        LauncherViewModel.KEY_PHOTO_MD3E_MINUTE_COLOR.name,
-        LauncherViewModel.KEY_PHOTO_MD3E_SECOND_COLOR.name,
-        LauncherViewModel.KEY_PHOTO_SHOW_SECONDS.name,
-        LauncherViewModel.KEY_PHOTO_CUSTOM_TEXT.name
+        PrefKeys.KEY_PHOTO_CLOCK_POSITION.name,
+        PrefKeys.KEY_PHOTO_CLOCK_SIZE.name,
+        PrefKeys.KEY_PHOTO_CLOCK_BOLD.name,
+        PrefKeys.KEY_PHOTO_CLOCK_STYLE.name,
+        PrefKeys.KEY_PHOTO_MD3E_SHAPE.name,
+        PrefKeys.KEY_PHOTO_USE_THEME_TEXT_COLOR.name,
+        PrefKeys.KEY_PHOTO_TEXT_COLOR.name,
+        PrefKeys.KEY_PHOTO_MD3E_AUTO_COLORS.name,
+        PrefKeys.KEY_PHOTO_MD3E_TEXT_COLOR.name,
+        PrefKeys.KEY_PHOTO_MD3E_FACE_COLOR.name,
+        PrefKeys.KEY_PHOTO_MD3E_HOUR_COLOR.name,
+        PrefKeys.KEY_PHOTO_MD3E_MINUTE_COLOR.name,
+        PrefKeys.KEY_PHOTO_MD3E_SECOND_COLOR.name,
+        PrefKeys.KEY_PHOTO_SHOW_SECONDS.name,
+        PrefKeys.KEY_PHOTO_CUSTOM_TEXT.name
     )
 
     private val videoPreferenceNames = setOf(
         videoPathKey,
-        LauncherViewModel.KEY_VIDEO_CLOCK_POSITION.name,
-        LauncherViewModel.KEY_VIDEO_CLOCK_SIZE.name,
-        LauncherViewModel.KEY_VIDEO_CLOCK_BOLD.name,
-        LauncherViewModel.KEY_VIDEO_FILL_SCREEN.name,
-        LauncherViewModel.KEY_VIDEO_CLOCK_COLOR_MODE.name,
-        LauncherViewModel.KEY_VIDEO_CLOCK_STYLE.name,
-        LauncherViewModel.KEY_VIDEO_MD3E_SHAPE.name,
-        LauncherViewModel.KEY_VIDEO_USE_THEME_TEXT_COLOR.name,
-        LauncherViewModel.KEY_VIDEO_TEXT_COLOR.name,
-        LauncherViewModel.KEY_VIDEO_MD3E_AUTO_COLORS.name,
-        LauncherViewModel.KEY_VIDEO_MD3E_TEXT_COLOR.name,
-        LauncherViewModel.KEY_VIDEO_MD3E_FACE_COLOR.name,
-        LauncherViewModel.KEY_VIDEO_MD3E_HOUR_COLOR.name,
-        LauncherViewModel.KEY_VIDEO_MD3E_MINUTE_COLOR.name,
-        LauncherViewModel.KEY_VIDEO_MD3E_SECOND_COLOR.name,
-        LauncherViewModel.KEY_VIDEO_SHOW_SECONDS.name,
-        LauncherViewModel.KEY_VIDEO_CUSTOM_TEXT.name
+        PrefKeys.KEY_VIDEO_CLOCK_POSITION.name,
+        PrefKeys.KEY_VIDEO_CLOCK_SIZE.name,
+        PrefKeys.KEY_VIDEO_CLOCK_BOLD.name,
+        PrefKeys.KEY_VIDEO_FILL_SCREEN.name,
+        PrefKeys.KEY_VIDEO_CLOCK_COLOR_MODE.name,
+        PrefKeys.KEY_VIDEO_CLOCK_STYLE.name,
+        PrefKeys.KEY_VIDEO_MD3E_SHAPE.name,
+        PrefKeys.KEY_VIDEO_USE_THEME_TEXT_COLOR.name,
+        PrefKeys.KEY_VIDEO_TEXT_COLOR.name,
+        PrefKeys.KEY_VIDEO_MD3E_AUTO_COLORS.name,
+        PrefKeys.KEY_VIDEO_MD3E_TEXT_COLOR.name,
+        PrefKeys.KEY_VIDEO_MD3E_FACE_COLOR.name,
+        PrefKeys.KEY_VIDEO_MD3E_HOUR_COLOR.name,
+        PrefKeys.KEY_VIDEO_MD3E_MINUTE_COLOR.name,
+        PrefKeys.KEY_VIDEO_MD3E_SECOND_COLOR.name,
+        PrefKeys.KEY_VIDEO_SHOW_SECONDS.name,
+        PrefKeys.KEY_VIDEO_CUSTOM_TEXT.name
     )
 
     private val settingsExcludedNames = setOf(
@@ -118,7 +118,7 @@ object FlueBackupManager {
         sideScreenShortcutsKey,
         sideScreenWidgetsKey,
         lastWatchFaceErrorKey,
-        LauncherViewModel.KEY_DINGDINGCAT_IMPORT_UNLOCKED.name,
+        PrefKeys.KEY_DINGDINGCAT_IMPORT_UNLOCKED.name,
         fontPathKey
     ) + photoPreferenceNames + videoPreferenceNames
 
@@ -141,22 +141,22 @@ object FlueBackupManager {
             manifest.put("settings", prefs.toPreferenceJson(excludeNames = settingsExcludedNames))
         }
         if (options.appOrder) {
-            manifest.put("appOrder", prefs[LauncherViewModel.KEY_APP_ORDER].orEmpty().splitCsvJson())
+            manifest.put("appOrder", prefs[PrefKeys.KEY_APP_ORDER].orEmpty().splitCsvJson())
         }
         if (options.widgetOrder) {
-            manifest.put("widgetOrder", prefs[LauncherViewModel.KEY_SIDE_SCREEN_WIDGETS].orEmpty().splitWidgetJson())
+            manifest.put("widgetOrder", prefs[PrefKeys.KEY_SIDE_SCREEN_WIDGETS].orEmpty().splitWidgetJson())
         }
         if (options.sideScreenOrder) {
-            manifest.put("sideScreenShortcuts", prefs[LauncherViewModel.KEY_SIDE_SCREEN_SHORTCUTS].orEmpty().splitShortcutJson())
+            manifest.put("sideScreenShortcuts", prefs[PrefKeys.KEY_SIDE_SCREEN_SHORTCUTS].orEmpty().splitShortcutJson())
         }
 
-        val photoMedia = prefs[LauncherViewModel.KEY_BUILTIN_PHOTO_PATH]
+        val photoMedia = prefs[PrefKeys.KEY_BUILTIN_PHOTO_PATH]
             ?.let(::File)
             ?.takeIf { it.isFile }
-        val videoMedia = prefs[LauncherViewModel.KEY_BUILTIN_VIDEO_PATH]
+        val videoMedia = prefs[PrefKeys.KEY_BUILTIN_VIDEO_PATH]
             ?.let(::File)
             ?.takeIf { it.isFile }
-        val fontMedia = prefs[LauncherViewModel.KEY_WATCHFACE_FONT_PATH]
+        val fontMedia = prefs[PrefKeys.KEY_WATCHFACE_FONT_PATH]
             ?.let(::File)
             ?.takeIf { it.isFile }
 
@@ -231,20 +231,20 @@ object FlueBackupManager {
                     val appOrder = manifest.optJSONArray("appOrder")
                         .toStringList()
                         .filter(availableAppKeys::contains)
-                    if (appOrder.isEmpty()) prefs.remove(LauncherViewModel.KEY_APP_ORDER) else prefs[LauncherViewModel.KEY_APP_ORDER] = appOrder.joinToString(",")
+                    if (appOrder.isEmpty()) prefs.remove(PrefKeys.KEY_APP_ORDER) else prefs[PrefKeys.KEY_APP_ORDER] = appOrder.joinToString(",")
                 }
                 if (selected.widgetOrder) {
                     val widgets = manifest.optJSONArray("widgetOrder")
                         .toStringList()
                         .filter { raw -> raw.widgetKeyPart() in validWidgetKeys }
-                    if (widgets.isEmpty()) prefs.remove(LauncherViewModel.KEY_SIDE_SCREEN_WIDGETS) else prefs[LauncherViewModel.KEY_SIDE_SCREEN_WIDGETS] = widgets.joinToString("|")
+                    if (widgets.isEmpty()) prefs.remove(PrefKeys.KEY_SIDE_SCREEN_WIDGETS) else prefs[PrefKeys.KEY_SIDE_SCREEN_WIDGETS] = widgets.joinToString("|")
                 }
                 if (selected.sideScreenOrder) {
                     val shortcuts = manifest.optJSONArray("sideScreenShortcuts")
                         .toNullableStringList()
                         .map { value -> value?.takeIf(availableAppKeys::contains) }
                     val serializedShortcuts = serializeShortcuts(shortcuts)
-                    if (serializedShortcuts.isEmpty()) prefs.remove(LauncherViewModel.KEY_SIDE_SCREEN_SHORTCUTS) else prefs[LauncherViewModel.KEY_SIDE_SCREEN_SHORTCUTS] = serializedShortcuts
+                    if (serializedShortcuts.isEmpty()) prefs.remove(PrefKeys.KEY_SIDE_SCREEN_SHORTCUTS) else prefs[PrefKeys.KEY_SIDE_SCREEN_SHORTCUTS] = serializedShortcuts
                 }
                 if (selected.photoWatchFace) {
                     restoreMediaWatchFace(
@@ -252,7 +252,7 @@ object FlueBackupManager {
                         tempRoot = tempRoot,
                         prefs = prefs,
                         manifest = manifest.optJSONObject("photoWatchFace"),
-                        mediaKey = LauncherViewModel.KEY_BUILTIN_PHOTO_PATH,
+                        mediaKey = PrefKeys.KEY_BUILTIN_PHOTO_PATH,
                         mediaFolder = "photo"
                     )
                 }
@@ -262,7 +262,7 @@ object FlueBackupManager {
                         tempRoot = tempRoot,
                         prefs = prefs,
                         manifest = manifest.optJSONObject("videoWatchFace"),
-                        mediaKey = LauncherViewModel.KEY_BUILTIN_VIDEO_PATH,
+                        mediaKey = PrefKeys.KEY_BUILTIN_VIDEO_PATH,
                         mediaFolder = "video"
                     )
                 }
@@ -297,7 +297,7 @@ object FlueBackupManager {
             ?.let { entry ->
                 val source = File(tempRoot, entry)
                 if (source.isFile) {
-                    prefs[LauncherViewModel.KEY_WATCHFACE_FONT_PATH] =
+                    prefs[PrefKeys.KEY_WATCHFACE_FONT_PATH] =
                         copyInternalWatchFaceMedia(context, source, "font")
                 }
             }
